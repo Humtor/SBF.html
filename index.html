@@ -133,6 +133,34 @@
             border: 2px solid #28a745; /* สีเขียวเมื่อเลือก */
         }
 
+        /* สไตล์สำหรับปุ่มรีเซ็ท */
+        .reset-button-container {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            text-align: center;
+        }
+
+        .reset-button {
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            background-color: #dc3545; /* สีแดงสำหรับปุ่มรีเซ็ท */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .reset-button:hover {
+            background-color: #c82333;
+        }
+
+        .reset-text {
+            margin-top: 10px;
+            color: white;
+            font-size: 1rem;
+        }
+
     </style>
 </head>
 <body>
@@ -167,6 +195,12 @@
 
     <!-- ป้ายสถานะ -->
     <div class="status" id="status" onclick="toggleStatus()">การแข่งขันครึ่งเวลาแรก</div>
+
+    <!-- ปุ่มรีเซ็ท -->
+    <div class="reset-button-container">
+        <button class="reset-button" onclick="resetAll()">รีเซ็ทค่าบนกระดาน</button>
+        
+    </div>
 
     <script>
         let homeScore = 0;
@@ -221,6 +255,20 @@
                 isFirstHalf = true;
             }
             statusElement.classList.toggle('active');
+        }
+
+        // ฟังก์ชันรีเซ็ททั้งหมด
+        function resetAll() {
+            homeScore = 0;
+            awayScore = 0;
+            seconds = 0;
+            isFirstHalf = true;
+            document.getElementById('score-home').textContent = homeScore;
+            document.getElementById('score-away').textContent = awayScore;
+            document.getElementById('time').textContent = "00:00";
+            document.getElementById('status').textContent = "การแข่งขันครึ่งเวลาแรก";
+            document.getElementById('status').classList.remove('active');
+            stopTimer();
         }
     </script>
 </body>
