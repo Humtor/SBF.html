@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Football Scoreboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #b0e57c; /* สีเขียวอ่อนสำหรับพื้นหลัง */
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            position: relative;
+        }
+
+        /* เพิ่มลูกฟุตบอลในพื้นหลัง */
+        .football {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 100px;
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/5/5f/Soccer_ball_2010.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .scoreboard {
+            text-align: center;
+            padding: 20px;
+            border: 5px solid green;
+            border-radius: 15px;
+            width: 400px;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #ffdd57;
+        }
+
+        .time {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .teams {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+
+        .team {
+            flex: 1;
+            text-align: center;
+        }
+
+        .team-name {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .score {
+            font-size: 3rem;
+            margin: 10px 0;
+            color: #ff0000;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        button {
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #28a745;
+            color: white;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .control-buttons {
+            margin-top: 20px;
+        }
+
+        .control-buttons button {
+            background-color: #ff4b5c;
+        }
+
+        .control-buttons button:hover {
+            background-color: #d90429;
+        }
+
+        /* ทำให้ชื่อทีมสามารถแก้ไขได้ */
+        .team-name[contenteditable="true"] {
+            border: 1px solid #fff;
+            padding: 5px;
+            cursor: text;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        /* สไตล์สำหรับป้ายสถานะ */
+        .status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .status.active {
+            border: 2px solid #28a745; /* สีเขียวเมื่อเลือก */
+        }
+
+    </style>
+</head>
+<body>
+    <div class="football"></div>
+    <div class="scoreboard">
+        <div class="title">กีฬาฟุตบอล</div>
+        <div class="time" id="time">00:00</div>
+        <div class="teams">
+            <div class="team" id="home">
+                <div class="team-name" contenteditable="true">HOME</div>
+                <div class="score" id="score-home">0</div>
+                <div class="buttons">
+                    <button onclick="updateScore('home', 1)">+</button>
+                    <button onclick="updateScore('home', -1)">-</button>
+                </div>
+            </div>
+            <div class="team" id="away">
+                <div class="team-name" contenteditable="true">AWAY</div>
+                <div class="score" id="score-away">0</div>
+                <div class="buttons">
+                    <button onclick="updateScore('away', 1)">+</button>
+                    <button onclick="updateScore('away', -1)">-</button>
+                </div>
+            </div>
+        </div>
+        <div class="control-buttons">
+            <button onclick="startTimer()">START</button>
+            <button onclick="stopTimer()">STOP</button>
+            <button onclick="resetTimer()">RESET</button>
+        </div>
+    </div>
+
+    <!-- ป้ายสถานะ -->
+    <div class="status" id="status" onclick="toggleStatus()">การแข่งขันครึ่งเวลาแรก</div>
+
+    <script>
+        let homeScore = 0;
+        let awayScore = 0;
+        let timerInterval;
+        let seconds = 0;
+        let isFirstHalf = true; // ใช้เพื่อระบุว่าตอนนี้เป็นครึ่งแรกหรือครึ่งหลัง
+
+        function updateScore(team, value) {
+            if (team === 'home') {
+                homeScore = Math.max(0, homeScore + value);
+                document.getElementById('score-home').textContent = homeScore;
+            } else if (team === 'away') {
+                awayScore = Math.max(0, awayScore + value);
+                document.getElementById('score-away').textContent = awayScore;
+            }
+        }
+
+        function startTimer() {
+            if (timerInterval) return;
+            timerInterval = setInterval(() => {
+                seconds++;
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        function resetTimer() {
+            stopTimer();
+            seconds = 0;
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            const minutes = String(Math.floor(seconds / 60)).padStart(2, '0');
+            const sec = String(seconds % 60).padStart(2, '0');
+            document.getElementById('time').textContent = `${minutes}:${sec}`;
+        }
+
+        // ฟังก์ชันสลับระหว่างครึ่งแรกและครึ่งหลัง
+        function toggleStatus() {
+            const statusElement = document.getElementById('status');
+            if (isFirstHalf) {
+                statusElement.textContent = "การแข่งขันครึ่งเวลาหลัง";
+                isFirstHalf = false;
+            } else {
+                statusElement.textContent = "การแข่งขันครึ่งเวลาแรก";
+                isFirstHalf = true;
+            }
+            statusElement.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>
